@@ -1,4 +1,6 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+
+#run with "python3" instead of "python" that runs Python 2
 
 import sys
 import codecs
