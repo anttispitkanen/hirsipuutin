@@ -1,5 +1,7 @@
 # Simple hangman solver, guesses letters in order of frequency
 
+import re
+
 print('anttispitkanen')
 
 words = []
@@ -8,18 +10,13 @@ temp_words = []
 word = input().strip()
 while word:
     words.append(word)
+    temp_words.append(word)
     word = input().strip()
 
-for word in words:
-    temp_words.append(word)
 
 letters = {letter for word in words for letter in word}
 frequencies = [(letter, sum(word.count(letter) for word in words)) for letter in letters]
 guess_order = sorted(frequencies, key=lambda a: a[1], reverse=True)
-
-lett = open('letters.txt', 'w')
-lett.write(str(guess_order) + '\n')
-lett.close()
 
 
 def remove_words_of_wrong_length(corr_length):
@@ -31,7 +28,7 @@ def remove_words_of_wrong_length(corr_length):
     return remaining_words
 
 
-def readjust(new_set_of_words):
+def recount_guess_order(new_set_of_words):
     letters = {letter for word in new_set_of_words for letter in word}
     frequencies = [(letter, sum(word.count(letter) for word in new_set_of_words)) for letter in letters]
     guess_order = sorted(frequencies, key=lambda a: a[1], reverse=True)
@@ -62,6 +59,12 @@ def filter_words_with_correct_letter(letter, words):
             new_words.append(word)
     return new_words
 
+def match_regex(reg_string, words):
+    new_words = []
+    for word in words:
+        if re.match(reg_string, word):
+            new_words.append(word)
+    return new_words
 
 
 # GAMEPLAY #####################################################################
@@ -72,24 +75,17 @@ try:
     while status:
 
         temp_words = remove_words_of_wrong_length(word_length)
-        guess_order = readjust(temp_words)
+        guess_order = recount_guess_order(temp_words)
         used_letters = []
-
-        sp = open('sanapituus.txt', 'w')
-        sp.write('olen päätellyt että sanan pituus on ' + str(word_length) + ' eli mahdollisia ovat:\n')
-        for word in temp_words:
-            sp.write(word + '\n')
-        sp.close()
-
-        lett = open('letters.txt', 'a')
-        lett.write(str(guess_order) + '\n')
-        lett.close()
-
 
         while True:
             most_common_letter = find_most_common_letter(guess_order, used_letters)
             used_letters.append(most_common_letter)
-            print(most_common_letter)
+
+            if len(temp_words) == 1:
+                print(temp_words[0])
+            else:
+                print(most_common_letter)
 
             result = input()
 
@@ -97,13 +93,15 @@ try:
             status = input()
 
             if result.startswith('HIT'):
-               #update based on a wrong letter
-               temp_words = filter_words_with_correct_letter(most_common_letter, temp_words)
-               guess_order = readjust(temp_words)
-            else:
                #update based on a correct letter
+               #temp_words = filter_words_with_correct_letter(most_common_letter, temp_words)
+
+               temp_words = match_regex(status, temp_words)
+               guess_order = recount_guess_order(temp_words)
+            else:
+               #update based on a wrong letter
                temp_words = filter_words_with_wrong_letter(most_common_letter, temp_words)
-               guess_order = readjust(temp_words)
+               guess_order = recount_guess_order(temp_words)
 
 
             if status.startswith('WIN') or status.startswith('LOSE') or not status:
