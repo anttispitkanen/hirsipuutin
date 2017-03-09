@@ -48,6 +48,22 @@ def find_most_common_letter(guess_order, forbidden_letters):
             i+=1
 
 
+def filter_words_with_wrong_letter(letter, words):
+    new_words = []
+    for word in words:
+        if letter not in word:
+            new_words.append(word)
+    return new_words
+
+def filter_words_with_correct_letter(letter, words):
+    new_words = []
+    for word in words:
+        if letter in word:
+            new_words.append(word)
+    return new_words
+
+
+
 # GAMEPLAY #####################################################################
 try:
     status = input()
@@ -77,22 +93,18 @@ try:
 
             result = input()
 
-            previous_status = status
+            #previous_status = status
             status = input()
 
-#            if previous_status == status:
-#                #update based on a wrong letter
-#                continue
-#            else:
-#                #update based on a correct letter
-#                continue
+            if result.startswith('HIT'):
+               #update based on a wrong letter
+               temp_words = filter_words_with_correct_letter(most_common_letter, temp_words)
+               guess_order = readjust(temp_words)
+            else:
+               #update based on a correct letter
+               temp_words = filter_words_with_wrong_letter(most_common_letter, temp_words)
+               guess_order = readjust(temp_words)
 
-        #for letter, frequency in guess_order:
-        #    print(letter)
-        #    result = input()
-        #    status = input()
-#            if status.startswith('WIN') or status.startswith('LOSE') or not status:
-#                break
 
             if status.startswith('WIN') or status.startswith('LOSE') or not status:
                 used_letters = []
