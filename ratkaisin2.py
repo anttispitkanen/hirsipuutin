@@ -52,12 +52,6 @@ def filter_words_with_wrong_letter(letter, words):
             new_words.append(word)
     return new_words
 
-def filter_words_with_correct_letter(letter, words):
-    new_words = []
-    for word in words:
-        if letter in word:
-            new_words.append(word)
-    return new_words
 
 def match_regex(reg_string, words):
     new_words = []
@@ -88,14 +82,10 @@ try:
                 print(most_common_letter)
 
             result = input()
-
-            #previous_status = status
             status = input()
 
             if result.startswith('HIT'):
                #update based on a correct letter
-               #temp_words = filter_words_with_correct_letter(most_common_letter, temp_words)
-
                temp_words = match_regex(status, temp_words)
                guess_order = recount_guess_order(temp_words)
             else:
@@ -108,10 +98,7 @@ try:
                 used_letters = []
                 status = input()
                 word_length = len(status)
-
                 break
-
-            #guess_order = readjust(temp_words)
 
 except EOFError:
     pass
